@@ -1,0 +1,9 @@
+
+# >>> pivota:opencode-ignore
+# OpenCode sandbox artifacts — do not commit
+.opencode/
+opencode.json
+opencode.json.bak
+AGENTS.md
+.opencode.session
+# <<< pivota:opencode-ignore
