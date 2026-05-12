@@ -2,16 +2,16 @@
 pivota_spec_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 01-foundation-01-PLAN.md
-last_updated: "2026-05-12T18:08:36.611Z"
-last_activity: 2026-05-12 — Roadmap created, all 18 v1 requirements mapped to 5 phases
+status: executing
+stopped_at: Completed 01-foundation-02-PLAN.md
+last_updated: "2026-05-12T22:49:51.782Z"
+last_activity: "2026-05-12 — Completed 01-01-PLAN.md: scaffold + config + schemas + registry"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 1
-  percent: 25
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-11)
 ## Current Position
 
 Phase: 1 of 5 (Foundation)
-Plan: 1 of 2 in current phase (01-01 complete, 01-02 pending)
-Status: In progress
-Last activity: 2026-05-12 — Completed 01-01-PLAN.md: scaffold + config + schemas + registry
+Plan: 2 of 2 in current phase (01-01 complete, 01-02 complete)
+Status: Phase 1 complete — ready for Phase 2
+Last activity: 2026-05-12 — Completed 01-02-PLAN.md: main.py, CORS, health endpoint, static serving
 
-Progress: [███░░░░░░░] 25%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [███░░░░░░░] 25%
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 01-foundation | P01 | 2min | 2 tasks | 12 files |
+| 01-foundation | P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: JobRecord as dataclass (not Pydantic) for in-memory mutable registry entries; API schemas use Pydantic BaseModel
 - [Phase 01-foundation]: threading.Lock for registry synchronization — simple sync lock sufficient, no async complexity needed
 - [Phase 01-foundation]: Module-level singletons: settings = Settings() and job_registry = JobRegistry() for import-time availability
+- [Phase 01-foundation]: asynccontextmanager lifespan used for FastAPI startup/shutdown — recommended pattern in 0.111+
+- [Phase 01-foundation]: Upload size enforcement at middleware via Content-Length header; actual byte counting deferred to Phase 3 validation service
+- [Phase 01-foundation]: StaticFiles mounted at /static; explicit GET / route serves index.html — avoids root redirect ambiguity
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-12T18:08:36.609Z
-Stopped at: Completed 01-foundation-01-PLAN.md
+Last session: 2026-05-12T22:49:51.780Z
+Stopped at: Completed 01-foundation-02-PLAN.md
 Resume file: None
