@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Foundation
-**Status**: awaiting verify
+**Status**: In Progress
 **Goal**: A running server that serves the frontend and is ready to receive upload requests
 **Depends on**: Nothing (first phase)
 **Requirements**: *(infrastructure — enables all other phases; no direct requirement IDs)*
