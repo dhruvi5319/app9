@@ -1,0 +1,26 @@
+/* PDF to DOCX Converter — styles.css */
+/* Full styles implemented in Phase 2 and Phase 5. */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  color: #1a1a1a;
+  background: #f9f9f9;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-notice {
+  color: #666;
+  font-style: italic;
+  margin-top: 1rem;
+}
