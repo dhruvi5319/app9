@@ -1,26 +1,197 @@
 /* PDF to DOCX Converter — styles.css */
-/* Full styles implemented in Phase 2 and Phase 5. */
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   font-family: system-ui, -apple-system, sans-serif;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  color: #1a1a1a;
-  background: #f9f9f9;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 1rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.container {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 2rem;
 }
 
 h1 {
-  font-size: 1.75rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
 }
 
-.placeholder-notice {
-  color: #666;
-  font-style: italic;
+/* ── Drop zone ─────────────────────────────────────────────────────────────── */
+
+.drop-zone {
+  border: 2px dashed #c0c0c0;
+  border-radius: 6px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  position: relative;
+}
+
+/* Applied by JS when file dragged over (US-0.2 hover highlight) */
+.drop-zone--dragover {
+  border-color: #0066cc;
+  background: #e8f0fe;
+}
+
+.drop-zone__prompt {
+  color: #555;
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.drop-zone__hint {
+  color: #888;
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+}
+
+#browse-btn {
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#browse-btn:hover { background: #0052a3; }
+#browse-btn:focus-visible { outline: 3px solid #0066cc; outline-offset: 2px; }
+
+/* ── File info area ─────────────────────────────────────────────────────────── */
+
+.file-info {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: #f0f4ff;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+#file-name { font-weight: 600; word-break: break-all; }
+#file-size { color: #555; white-space: nowrap; }
+
+/* ── Convert button ─────────────────────────────────────────────────────────── */
+
+#convert-btn {
+  display: block;
+  width: 100%;
   margin-top: 1rem;
+  padding: 0.75rem;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#convert-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+#convert-btn:not(:disabled):hover { background: #15803d; }
+#convert-btn:focus-visible { outline: 3px solid #16a34a; outline-offset: 2px; }
+
+/* ── Progress bar ──────────────────────────────────────────────────────────── */
+
+#upload-progress {
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin-top: 1rem;
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: #e5e7eb;
+}
+
+#upload-progress::-webkit-progress-bar { background: #e5e7eb; border-radius: 4px; }
+#upload-progress::-webkit-progress-value { background: #0066cc; border-radius: 4px; transition: width 0.1s; }
+#upload-progress::-moz-progress-bar { background: #0066cc; border-radius: 4px; }
+
+/* ── Status banner ─────────────────────────────────────────────────────────── */
+
+.status-banner {
+  margin-top: 1rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-height: 0;
+}
+
+/* Applied by JS via setState — add to .status-banner element */
+.status-banner--uploading { background: #eff6ff; color: #1d4ed8; }
+.status-banner--converting { background: #fefce8; color: #854d0e; }
+.status-banner--success { background: #f0fdf4; color: #15803d; }
+.status-banner--error { background: #fef2f2; color: #b91c1c; }
+
+/* ── Error detail paragraph ─────────────────────────────────────────────────── */
+
+.error-detail {
+  margin-top: 0.5rem;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ── Try Again button + Convert Another link ────────────────────────────────── */
+
+#try-again-btn {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1.25rem;
+  background: #fff;
+  color: #b91c1c;
+  border: 1.5px solid #b91c1c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#try-again-btn:hover { background: #fef2f2; }
+
+#convert-another-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #0066cc;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+/* ── Drop zone focus ring for keyboard accessibility (US-0.6) ──────────────── */
+
+#drop-zone:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 3px;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .container { padding: 1.25rem; margin-top: 0; border-radius: 0; }
+  h1 { font-size: 1.25rem; }
 }
