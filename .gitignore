@@ -12,3 +12,14 @@ AGENTS.md
 node_modules/
 test-results/
 playwright-report/
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+*.egg-info/
+dist/
+.venv/
+venv/
+/tmp/
+*.log
