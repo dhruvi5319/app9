@@ -7,3 +7,8 @@ opencode.json.bak
 AGENTS.md
 .opencode.session
 # <<< pivota:opencode-ignore
+
+# Dependencies and test artifacts — do not commit
+node_modules/
+test-results/
+playwright-report/
