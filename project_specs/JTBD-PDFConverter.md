@@ -193,7 +193,9 @@ When I receive a client PDF containing a statement of work, rate table, or refer
 - Output quality is consistent across repeated conversions of the same file (no random degradation)
 - For straightforward client documents (standard SoW, contract, rate table), zero manual layout reconstruction is required
 
-**Success Measure:** Dana opens the converted DOCX and can begin editing content within 2 minutes of download — with no table rows to merge, no list numbering to restore, and no heading styles to manually reapply.
+**Definition — "standard document" for this job:** A single-column, text-primary document created in a standard authoring tool (Microsoft Word, Google Docs, LibreOffice) and exported or printed to PDF. Includes: statements of work, contracts, rate tables with simple grids (≤ 5 columns), and numbered clause documents. Excludes: scanned PDFs, multi-column magazine layouts, heavily nested tables (tables inside table cells), PDFs with embedded forms, PDFs with custom font subsets or ligatures that are not encoded as Unicode.
+
+**Success Measure:** Dana opens the converted DOCX and can begin editing content within 2 minutes of download — with no table rows to merge, no list numbering to restore, and no heading styles to manually reapply — for any PDF that qualifies as a "standard document" per the definition above.
 
 **Related Features:** F1, F2, F3
 **Priority:** P0

@@ -227,10 +227,11 @@ No database tables. File is transmitted directly to the server in a multipart PO
    - If `pdf2docx` raises an exception → attempt fallback (step 7).
    - If `pdf2docx` succeeds → proceed to step 8.
 7. **Fallback — LibreOffice headless (if `pdf2docx` failed):**
-   - Execute: `libreoffice --headless --convert-to docx {source_path} --outdir {job_dir}` via `subprocess.run` with a 60-second timeout.
-   - If fallback also fails or times out → return `422 UNPROCESSABLE_ENTITY` with error code `CONVERSION_FAILED`; delete temp files.
+    - Invoke LibreOffice in headless/non-GUI mode to convert the source PDF to DOCX format, writing the output to the same job directory. Apply the same 60-second timeout as the primary converter.
+    - If fallback also fails or times out → return `422 UNPROCESSABLE_ENTITY` with error code `CONVERSION_FAILED`; delete temp files.
 8. **Image-only PDF detection:**
-   - Inspect output DOCX: if it contains zero paragraphs with text content → return `422 UNPROCESSABLE_ENTITY` with error code `IMAGE_ONLY_PDF`; delete temp files.
+    - Inspect output DOCX: if it contains zero paragraphs whose stripped text content has a character length > 0 (i.e., no paragraph contains any non-whitespace characters) → return `422 UNPROCESSABLE_ENTITY` with error code `IMAGE_ONLY_PDF`; delete temp files.
+    - Note: empty table cells, whitespace-only paragraphs, and paragraphs containing only line-break runs do **not** count as text content for this check.
 9. **Success:** Return `200 OK` JSON response containing `job_id` and `filename` (derived from original filename).
 10. **Temp files retained** at `{TEMP_DIR}/{job_id}/` for download by the client (see F02). Subject to TTL sweep after 60 minutes.
 
@@ -457,7 +458,22 @@ Reads from `{TEMP_DIR}/{job_id}/{job_id}.docx`. Updates job registry entry to `C
 | `UPLOADING` | User clicks "Convert to DOCX" with valid file | Progress bar 0–100%; Convert button disabled with spinner; form locked |
 | `CONVERTING` | Upload reaches 100% (server acknowledged receipt) | Spinner + "Converting your document…" message; no progress bar |
 | `SUCCESS` | Server returns `200` from `/api/convert`; download delivered | Green tick + "Your DOCX is ready!" message; "Download DOCX" button; link to convert another |
-| `ERROR` | Any error from client-side validation, upload, or server | Red alert icon + human-readable error message + error detail; "Try Again" button |
+| `ERROR` | Any error from client-side validation, upload, server response, or failed download | Red alert icon + human-readable error message + error detail; "Try Again" button |
+
+**Valid state transitions:**
+
+| From | To | Trigger |
+|------|----|---------|
+| `IDLE` | `UPLOADING` | User clicks "Convert to DOCX" with valid file |
+| `UPLOADING` | `CONVERTING` | Upload bytes fully transmitted (100%) |
+| `UPLOADING` | `ERROR` | Network error during upload |
+| `CONVERTING` | `SUCCESS` | Server returns `200` on `POST /api/convert` |
+| `CONVERTING` | `ERROR` | Server returns `4xx` or `5xx` on `POST /api/convert` |
+| `SUCCESS` | `ERROR` | `GET /api/download/{job_id}` returns error (e.g., `404 JOB_NOT_FOUND` on a second download attempt after files are deleted) |
+| `SUCCESS` | `IDLE` | User clicks "Convert Another File" |
+| `ERROR` | `IDLE` | User clicks "Try Again" |
+
+No other transitions are valid. Transitions that skip states (e.g., `IDLE` → `SUCCESS`) are forbidden.
 
 ---
 
@@ -478,6 +494,7 @@ Reads from `{TEMP_DIR}/{job_id}/{job_id}.docx`. Updates job registry entry to `C
    - Browser receives file download response → OS download dialog opens.
    - UI transitions to `SUCCESS`.
 8. **`SUCCESS` state:** Display "Your DOCX is ready!" with a green tick. Render "Convert Another File" link that returns UI to `IDLE`.
+   - If the user clicks "Download DOCX" a second time after the files have already been deleted, `GET /api/download/{job_id}` returns `404 JOB_NOT_FOUND` → UI transitions from `SUCCESS` to `ERROR` with message "Your conversion result has expired."
 9. **If server returns any error (4xx, 5xx):**
    - UI transitions to `ERROR`.
    - Display human-readable message mapped from error code (see Error Message Map below).
@@ -528,7 +545,8 @@ Reads from `{TEMP_DIR}/{job_id}/{job_id}.docx`. Updates job registry entry to `C
 - **MUST** map every defined server error code to a user-friendly message (see Error Message Map).
 - **MUST** display a generic fallback message for any unmapped error code or unexpected HTTP status.
 - **MUST** reset the file input field when the user clicks "Try Again" (clearing the previously selected file).
-- **MUST** prevent state transitions that skip states (e.g., jumping from `IDLE` to `SUCCESS`).
+- **MUST** prevent state transitions that skip states (e.g., jumping from `IDLE` to `SUCCESS`) or that are not listed in the valid state transition table.
+- **MUST** transition from `SUCCESS` to `ERROR` (with `JOB_NOT_FOUND` message) if `GET /api/download/{job_id}` returns a non-200 response.
 - **MUST NOT** display raw error codes, stack traces, or internal server details to the user.
 - **SHOULD** colour-code states: neutral/blue for progress, green for success, red for error.
 - **MUST** ensure the "Try Again" button is keyboard-focusable and activatable.
@@ -609,11 +627,11 @@ No storage. All state is maintained client-side in JavaScript. No backend schema
 11. On **success**: retain files for download (F02). Delete after download confirmed or TTL expires.
 
 **B. TTL Background Sweep (periodic, autonomous):**
-1. The sweep runs on a configurable schedule (default: every 10 minutes).
+1. The sweep runs on a configurable schedule (default: every 10 minutes). The scheduling mechanism is an implementation detail left to the implementer (e.g., a background thread, scheduled task, or startup/periodic sweep).
 2. List all subdirectories of `{TEMP_DIR}/`.
-3. For each subdirectory, check the directory creation timestamp (or a `created_at` metadata file).
-4. If `now - created_at > TTL` (default 60 minutes) → delete the subdirectory and all contents.
-5. Log the count of directories swept and bytes freed (no file content or identifying info logged).
+3. For each subdirectory, determine its age using a reliable timestamp source (directory creation time or a `created_at` marker file written at job creation).
+4. If the subdirectory age exceeds the configured TTL (default 60 minutes) → delete the subdirectory and all contents.
+5. Log the count of directories deleted and bytes freed (no file content or identifying info logged).
 
 **C. Concurrent Job Control:**
 1. Maintain a server-side counter of active conversion jobs (in-process atomic integer or Redis counter).

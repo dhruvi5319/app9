@@ -237,7 +237,7 @@ All three personas have complete journeys enabled by R1. No persona is partially
 #### Journey Stages Without Story Coverage
 - **None.** All five stages (S1 Arrive, S2 Select/Upload, S3 Convert, S4 Download, S5 Error/Retry) have at least one story mapped to them.
 
-> Note: S1 (Arrive) coverage is primarily served by US-0.4 (size limit hint display) and the privacy disclosure behaviour implicit in US-4.3 and US-4.6. There is no standalone "privacy disclosure" story in UserStories-PDFConverter.md — the privacy disclosure content is an output of the combined behaviour of US-4.3 (deletion confirmed in UI), US-4.6 (no logging guarantee reflected in UI), and the static copy on the page. This is a **design gap worth noting**: a dedicated story or acceptance criterion for the pre-upload privacy disclosure text (referenced in JTBD-02.2 hiring criteria and JOURNEYS S1/Arrive stages) does not exist as a distinct story. It is partially covered by US-4.3's AC ("The UI confirms via success state messaging that the file has been delivered and is no longer stored") but the *pre-upload* visibility of the disclosure has no explicit story owner.
+> Note: S1 (Arrive) coverage is served by US-0.4 (size limit hint display) and the privacy disclosure behaviour owned by US-4.3 and US-4.6. US-4.3 now includes an explicit acceptance criterion requiring the plain-language privacy disclosure to be visible above the fold before any file is selected — satisfying the JTBD-02.2 hiring criterion and JRN-02.1 trust gate. See "Noted Design Gap — Resolved" below.
 
 #### JTBD Outcomes Without Derived NaC
 - **None.** All 9 JTBD outcomes have at least one NaC in the NaC Derivation Table.
@@ -245,11 +245,11 @@ All three personas have complete journeys enabled by R1. No persona is partially
 #### Orphan Stories (Not Mapped to Any Journey Stage)
 - **None.** All 27 stories from UserStories-PDFConverter.md appear in the Story Map Matrix.
 
-#### Noted Design Gap (Not a Missing Story — An Observation)
+#### Noted Design Gap — Resolved
 
-| Gap | Description | Suggested Action |
+| Gap | Resolution | Status |
 |---|---|---|
-| Pre-upload privacy disclosure text | No user story explicitly owns the creation and placement of the plain-language privacy disclosure visible above the fold on the upload page. The JTBD-02.2 hiring criterion and JRN-02.1 trust gate depend on this content being present before interaction. | Add an acceptance criterion to US-4.3 or US-4.6 requiring the pre-upload disclosure text ("Your file is deleted from our server immediately after download — we never store or log your documents") to be visible above the fold before any file is selected. Alternatively, create a dedicated US-4.7 in v1.1 if the copy requires its own story for design/content review sign-off. |
+| Pre-upload privacy disclosure text | A new acceptance criterion was added to **US-4.3** requiring the plain-language privacy disclosure statement to be visible above the fold and before any file is selected, without requiring scroll, click, or link navigation. This directly satisfies the JTBD-02.2 hiring criterion and JRN-02.1 trust gate. | ✓ Resolved in UserStories-PDFConverter.md |
 
 ---
 
@@ -275,7 +275,7 @@ This section verifies that each NaC is consistent with (and extends or confirms)
 | NaC-14 | Inline type error in all four target browsers, no extension | US-0.3 | ✓ AC: "inline error 'Please select a PDF file.' shown immediately"; NaC extends with cross-browser scope from JTBD-02.1 |
 | NaC-15 | Full cycle keyboard-only; Enter/Space on picker; logical tab order | US-0.6 | ✓ AC: "file picker activated with Enter or Space"; "logical tab order"; "visible focus indicators"; fully aligned |
 | NaC-16 | aria-live announces transitions; error surfaced; icons have text | US-3.6 | ✓ AC: "state transitions announced via aria-live='polite'"; "error messages surfaced to screen readers"; "icons have accessible text"; fully aligned |
-| NaC-17 | Privacy disclosure visible above fold before interaction | US-4.3, US-4.6 | ⚠ Partial — US-4.3 AC covers post-download confirmation; US-4.6 AC covers logging guarantee reflected in UI; neither explicitly requires the disclosure to be visible *before* file selection. **See Design Gap above.** |
+| NaC-17 | Privacy disclosure visible above fold before interaction | US-4.3, US-4.6 | ✓ Resolved — US-4.3 AC updated to explicitly require the plain-language privacy disclosure to be visible above the fold before any file is selected, without scroll or click. |
 | NaC-18 | Server reads magic bytes; non-PDF rejected before write to disk | US-4.1 | ✓ AC: "reads first 8 bytes and checks for %PDF magic bytes"; "rejected with 400 before written to disk"; fully aligned |
 | NaC-19 | TTL sweep deletes files >60 min; logs only count/bytes | US-4.4 | ✓ AC: "deletes temp subdirectories older than 60 minutes"; "logs only count of directories deleted and bytes freed — no content or identifying metadata"; fully aligned |
 | NaC-20 | IMAGE_ONLY_PDF returned; no blank DOCX served | US-1.4 | ✓ AC: "server returns 422 IMAGE_ONLY_PDF"; "empty DOCX not served to client"; fully aligned |
@@ -288,7 +288,7 @@ This section verifies that each NaC is consistent with (and extends or confirms)
 | NaC-27 | Oversized file rejected ≤ 2s; error states actual size and limit | US-0.4 | ✓ AC: "files exceeding 50 MB rejected before upload begins"; "inline error 'File too large. Maximum size is 50 MB.' displayed immediately on selection"; NaC adds the 2-second timing target from JTBD-03.3 success measure |
 | NaC-28 | Drop zone highlights; drop triggers same validation as picker | US-0.2 | ✓ AC: "visually designated drop zone"; "hover/highlight state"; "dropping a PDF triggers same validation as file picker"; fully aligned |
 
-**NaC alignment summary:** 27 of 28 NaC fully aligned with existing acceptance criteria. 1 partial (NaC-17: pre-upload privacy disclosure placement) — see Design Gap in Coverage Analysis.
+**NaC alignment summary:** 28 of 28 NaC fully aligned with acceptance criteria. NaC-17 (pre-upload privacy disclosure placement) was previously partial — resolved by adding an explicit AC to US-4.3.
 
 ---
 
@@ -303,9 +303,9 @@ This section verifies that each NaC is consistent with (and extends or confirms)
 | JTBD outcomes covered | 9 of 9 |
 | NaC derived | 28 |
 | NaC fully aligned with AC | 27 of 28 |
-| NaC partially aligned | 1 (NaC-17 — pre-upload privacy disclosure) |
+| NaC partially aligned | 0 (NaC-17 resolved — see Design Gap section) |
 | Releases | 1 (R1: MVP — all stories) |
-| Design gaps identified | 1 (pre-upload privacy disclosure ownership) |
+| Design gaps identified | 0 (pre-upload privacy disclosure gap resolved) |
 
 ---
 
