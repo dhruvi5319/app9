@@ -29,10 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `GET /api/health` returns `{ "status": "ok" }` with 200
   3. Environment variables (`TEMP_DIR`, `MAX_FILE_SIZE_BYTES`, `JOB_TIMEOUT_SECONDS`, `MAX_CONCURRENT_JOBS`, `TTL_MINUTES`) load from `.env` with typed defaults
   4. Temp directory (`/tmp/pdfconverter/`) is created on startup and is writable
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Project scaffold — directory layout, `requirements.txt`, `main.py`, config, health endpoint
+- [ ] 01-01-PLAN.md — Project scaffold: directory layout, requirements.txt, core/config.py, models/schemas.py, core/registry.py
+- [ ] 01-02-PLAN.md — App wiring: main.py (FastAPI app, CORS, health endpoint, static serving, lifecycle hooks), placeholder static files
 
 ### Phase 2: Upload Interface
 **Goal**: Users can select a PDF (via file picker or drag-and-drop) and see client-side validation before any server request is made
@@ -105,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/1 | Not started | - |
+| 1. Foundation | 0/2 | Not started | - |
 | 2. Upload Interface | 0/2 | Not started | - |
 | 3. Conversion Engine | 0/3 | Not started | - |
 | 4. Download & Cleanup | 0/2 | Not started | - |
