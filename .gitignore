@@ -7,3 +7,13 @@ opencode.json.bak
 AGENTS.md
 .opencode.session
 # <<< pivota:opencode-ignore
+
+__pycache__/
+*.py[cod]
+.env
+*.egg-info/
+dist/
+.venv/
+venv/
+/tmp/
+*.log
