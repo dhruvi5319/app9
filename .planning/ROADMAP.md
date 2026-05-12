@@ -46,11 +46,11 @@ Plans:
   3. User sees an inline error immediately (without a server round-trip) if they select a non-PDF file
   4. User sees an inline error immediately if they select a file larger than 50 MB
   5. User sees a progress bar filling from 0% to 100% while the file uploads to the server
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: `index.html` + `styles.css` — drop zone, file picker, filename/size display, Convert button, progress bar markup
-- [ ] 02-02: `app.js` — client-side type/size validation, drag-and-drop handlers, upload progress via XHR
+- [ ] 02-01-PLAN.md — index.html + styles.css + playwright.config.ts: full semantic markup (all TechArch §2.2 elements), responsive CSS state classes, Playwright test runner setup
+- [ ] 02-02-PLAN.md — app.js + e2e/upload-interface.spec.ts: state machine (IDLE/UPLOADING/CONVERTING/SUCCESS/ERROR), drag-drop, type/size validation, XHR upload with progress, keyboard accessibility, Playwright e2e tests
 
 ### Phase 3: Conversion Engine
 **Goal**: The server accepts a valid PDF upload, converts it to DOCX, and returns a job ID — rejecting invalid files and timed-out jobs with structured errors
