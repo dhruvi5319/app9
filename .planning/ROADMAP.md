@@ -80,11 +80,11 @@ Plans:
   2. After the download completes, both the source PDF and the DOCX are deleted from the server's temp directory
   3. A TTL sweep running every 10 minutes deletes any job directories older than 60 minutes (orphaned files are removed even if the client never downloaded)
   4. Requesting a `job_id` that has already been downloaded returns `404 JOB_NOT_FOUND`
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: `services/download.py` + `routers/download.py` — streaming DOCX delivery, derived filename, post-download cleanup
-- [ ] 04-02: `core/cleanup.py` — TTL background sweep, orphaned file deletion, sweep logging
+- [ ] 04-01-PLAN.md — `services/download.py` + `routers/download.py` — DownloadService, FileResponse streaming, UUID v4 validation, post-download BackgroundTask cleanup; wire download router into main.py (Wave 1)
+- [ ] 04-02-PLAN.md — `core/cleanup.py` — CleanupService async TTL sweep, orphaned dir deletion, registry sync, sweep logging; extend main.py lifespan with asyncio background sweep task (Wave 2)
 
 ### Phase 5: Feedback & Polish
 **Goal**: Users are informed at every stage of the workflow with clear, specific messages — and can recover from any error without refreshing the page
