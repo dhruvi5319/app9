@@ -41,7 +41,7 @@ Plans:
 - [ ] 01-02-PLAN.md — App wiring: main.py (FastAPI app, CORS, health endpoint, static serving, lifecycle hooks), placeholder static files
 
 ### Phase 2: Upload Interface
-**Status**: failed
+**Status**: In Progress
 **Goal**: Users can select a PDF (via file picker or drag-and-drop) and see client-side validation before any server request is made
 **Depends on**: Phase 1
 **Requirements**: UPLD-01, UPLD-02, UPLD-03, UPLD-04, UPLD-05
