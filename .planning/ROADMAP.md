@@ -12,7 +12,7 @@ Five phases deliver the complete MVP: first the server foundation is scaffolded,
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Project scaffolding, FastAPI server skeleton, configuration, and static file serving
+- [x] **Phase 1: Foundation** - Project scaffolding, FastAPI server skeleton, configuration, and static file serving *(completed 2026-05-12)*
 - [ ] **Phase 2: Upload Interface** - Browser upload UI with drag-and-drop, file picker, client-side validation, and progress indicator
 - [ ] **Phase 3: Conversion Engine** - Server-side PDF-to-DOCX conversion with timeout, fallback, image-only detection, and input validation
 - [ ] **Phase 4: Download & Cleanup** - DOCX file delivery, derived filename, post-download deletion, and TTL orphan sweep
@@ -21,7 +21,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Foundation
+<<<<<<< HEAD
 **Status**: In Progress
+=======
+**Status**: executing
+>>>>>>> main
 **Goal**: A running server that serves the frontend and is ready to receive upload requests
 **Depends on**: Nothing (first phase)
 **Requirements**: *(infrastructure — enables all other phases; no direct requirement IDs)*
@@ -37,7 +41,7 @@ Plans:
 - [ ] 01-02-PLAN.md — App wiring: main.py (FastAPI app, CORS, health endpoint, static serving, lifecycle hooks), placeholder static files
 
 ### Phase 2: Upload Interface
-**Status**: In Progress
+**Status**: executing
 **Goal**: Users can select a PDF (via file picker or drag-and-drop) and see client-side validation before any server request is made
 **Depends on**: Phase 1
 **Requirements**: UPLD-01, UPLD-02, UPLD-03, UPLD-04, UPLD-05
@@ -108,7 +112,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Not started | - |
+| 1. Foundation | 2/2 | ✓ Complete | 2026-05-12 |
 | 2. Upload Interface | 0/2 | Not started | - |
 | 3. Conversion Engine | 0/3 | Not started | - |
 | 4. Download & Cleanup | 0/2 | Not started | - |

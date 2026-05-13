@@ -8,12 +8,16 @@ AGENTS.md
 .opencode.session
 # <<< pivota:opencode-ignore
 
+<<<<<<< HEAD
 # Dependencies and test artifacts — do not commit
 node_modules/
 test-results/
 playwright-report/
 
 # Python
+=======
+<<<<<<< HEAD
+>>>>>>> main
 __pycache__/
 *.py[cod]
 .env
@@ -23,3 +27,12 @@ dist/
 venv/
 /tmp/
 *.log
+<<<<<<< HEAD
+=======
+=======
+# Dependencies and test artifacts — do not commit
+node_modules/
+test-results/
+playwright-report/
+>>>>>>> 4f70401 (chore: add pivota gitignore entries)
+>>>>>>> main
