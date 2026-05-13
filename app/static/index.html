@@ -1,21 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'" />
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'">
   <title>PDF to DOCX Converter</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-  <main>
+  <main class="container">
     <h1>PDF to DOCX Converter</h1>
-    <p>Upload a PDF and download a Word document you can edit.</p>
-    <p class="placeholder-notice">
-      Upload interface coming soon — server is running and ready.
-    </p>
+
+    <!-- 1. Drop zone: a <div> containing a hidden <input type="file"> -->
+    <div id="drop-zone" class="drop-zone" role="button" tabindex="0"
+         aria-label="Drop PDF here or click to browse">
+      <input id="file-input" type="file" accept=".pdf,application/pdf"
+             aria-label="Select a PDF file" hidden>
+      <p class="drop-zone__prompt">Drag &amp; drop your PDF here</p>
+      <button id="browse-btn" type="button">Browse file</button>
+      <!-- Size hint visible before selection (US-0.4 requirement) -->
+      <p class="drop-zone__hint">Maximum file size: 50 MB</p>
+    </div>
+
+    <!-- 2. Filename + size display area (hidden until file selected) -->
+    <div id="file-info" class="file-info" hidden>
+      <span id="file-name"></span>
+      <span id="file-size"></span>
+    </div>
+
+    <!-- 3. Convert button (disabled until valid file selected) -->
+    <button id="convert-btn" type="button" disabled>Convert to DOCX</button>
+
+    <!-- 4. <progress> element for upload progress (hidden during IDLE) -->
+    <progress id="upload-progress" value="0" max="100" hidden
+              aria-label="Upload progress"></progress>
+
+    <!-- 5. Status banner with aria-live="polite" for screen reader announcements -->
+    <div id="status-banner" class="status-banner" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- 6. Error detail <p> (hidden unless in ERROR state) -->
+    <p id="error-detail" class="error-detail" hidden></p>
+
+    <!-- 7. Try Again button (visible in ERROR state) -->
+    <button id="try-again-btn" type="button" hidden>Try Again</button>
+
+    <!-- 8. Convert Another File anchor (visible in SUCCESS state) -->
+    <a id="convert-another-link" href="#" hidden>Convert Another File</a>
   </main>
+
   <script src="/static/app.js"></script>
 </body>
 </html>

@@ -97,7 +97,9 @@ async def health_check() -> HealthResponse:
     )
 
 
-# Phase 3: from app.routers.convert import router as convert_router
-# Phase 3: app.include_router(convert_router, prefix="/api")
+# Phase 3 wiring
+from app.routers.convert import router as convert_router
+app.include_router(convert_router, prefix="/api")
+
 # Phase 4: from app.routers.download import router as download_router
 # Phase 4: app.include_router(download_router, prefix="/api")
