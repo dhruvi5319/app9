@@ -54,6 +54,7 @@ Plans:
 - [ ] 02-02-PLAN.md — app.js + e2e/upload-interface.spec.ts: state machine (IDLE/UPLOADING/CONVERTING/SUCCESS/ERROR), drag-drop, type/size validation, XHR upload with progress, keyboard accessibility, Playwright e2e tests
 
 ### Phase 3: Conversion Engine
+**Status**: Planned
 **Goal**: The server accepts a valid PDF upload, converts it to DOCX, and returns a job ID — rejecting invalid files and timed-out jobs with structured errors
 **Depends on**: Phase 2
 **Requirements**: CONV-01, CONV-02, CONV-03, SECU-01, SECU-04
@@ -63,12 +64,12 @@ Plans:
   3. A conversion that exceeds 60 seconds is terminated and returns `504 CONVERSION_TIMEOUT`
   4. An image-only (scanned) PDF that produces an empty DOCX returns `422 IMAGE_ONLY_PDF` with the temp file deleted
   5. All temp files are written only to the isolated temp directory using UUID filenames — never the original filename
-**Plans**: TBD
+**Plans**: 3 plans (Wave 1 → Wave 2 → Wave 3, fully sequential)
 
 Plans:
-- [ ] 03-01: `services/validation.py` — magic byte check, size enforcement, MIME header check
-- [ ] 03-02: `services/conversion.py` — pdf2docx primary, LibreOffice fallback, timeout watchdog, image-only detection
-- [ ] 03-03: `core/registry.py` + `routers/convert.py` — job registry, concurrent job limit, convert endpoint wiring
+- [ ] 03-01-PLAN.md — `app/services/validation.py`: ValidationService + exception hierarchy (MimeTypeError, FiletypeError, FileSizeError); magic byte check, MIME check, byte-count size enforcement; Wave 1 (no deps)
+- [ ] 03-02-PLAN.md — `app/services/conversion.py`: ConversionService + ConversionResult; pdf2docx primary with ThreadPoolExecutor timeout watchdog, LibreOffice headless fallback, image-only detection, UUID v4 filenames, permissions 600/700, temp cleanup on all failure paths; Wave 2 (depends on 03-01)
+- [ ] 03-03-PLAN.md — `app/routers/convert.py` + `app/core/registry.py` (verify) + `app/main.py` (wire): POST /api/convert endpoint with full 7-code HTTP response mapping (200/400/413/422/500/503/504), concurrent job limit gate, router included under /api prefix; Wave 3 (depends on 03-01 + 03-02)
 
 ### Phase 4: Download & Cleanup
 **Goal**: Users receive their DOCX file as a browser download, the file is named meaningfully, and no files remain on the server after download
@@ -110,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | ✓ Complete | 2026-05-12 |
 | 2. Upload Interface | 0/2 | Not started | - |
-| 3. Conversion Engine | 0/3 | Not started | - |
+| 3. Conversion Engine | 0/3 | Planned | - |
 | 4. Download & Cleanup | 0/2 | Not started | - |
 | 5. Feedback & Polish | 0/2 | Not started | - |
