@@ -16,23 +16,40 @@ const statusBanner   = document.getElementById('status-banner');
 const errorDetail    = document.getElementById('error-detail');
 const tryAgainBtn    = document.getElementById('try-again-btn');
 const convertAnotherLink = document.getElementById('convert-another-link');
+const downloadBtn        = document.getElementById('download-btn');
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let currentState = 'IDLE';
 let selectedFile  = null;
+let lastJobId     = null;   // Stored for download-btn re-trigger
+let lastFilename  = null;
 
-// ─── Error Message Map (from TechArch §4.2 ErrorCode) ────────────────────────
+// ─── Error Message Map — primary messages (FRD §F03, exact strings) ──────────
 const ERROR_MESSAGES = {
-  INVALID_FILE_TYPE:  'The server rejected this file. Please select a valid PDF.',
-  FILE_TOO_LARGE:     'File too large. Maximum size is 50 MB.',
-  CONVERSION_TIMEOUT: 'Conversion timed out. Please try again with a smaller file.',
-  CONVERSION_FAILED:  'Conversion failed. Please try a different PDF file.',
+  INVALID_FILE_TYPE:  "This file doesn't appear to be a valid PDF.",
+  FILE_TOO_LARGE:     'Your file is too large to convert.',
+  CONVERSION_TIMEOUT: 'Conversion took too long and was cancelled.',
+  CONVERSION_FAILED:  "We couldn't convert this PDF.",
   IMAGE_ONLY_PDF:     'This PDF contains only images and cannot be converted.',
-  SERVER_BUSY:        'Server is busy. Please wait a moment and try again.',
-  INTERNAL_ERROR:     'An unexpected server error occurred. Please try again.',
-  JOB_NOT_FOUND:      'Download link expired. Please convert the file again.',
+  SERVER_BUSY:        'The server is busy. Please try again in a moment.',
+  INTERNAL_ERROR:     'Something went wrong on our end.',
+  JOB_NOT_FOUND:      'Your conversion result has expired.',
   JOB_FAILED:         'Conversion job failed. Please try again.',
   INVALID_JOB_ID:     'Invalid job reference. Please try again.',
+};
+
+// ─── Error Detail Map — secondary explanatory text (FRD §F03) ────────────────
+const ERROR_DETAILS = {
+  INVALID_FILE_TYPE:  'The server was unable to verify the file as a PDF document.',
+  FILE_TOO_LARGE:     'Maximum file size is 50 MB. Please try a smaller PDF.',
+  CONVERSION_TIMEOUT: 'Large or complex PDFs may exceed the processing time limit. Try a smaller document.',
+  CONVERSION_FAILED:  'The document may use an unsupported format or structure. Try re-saving it from the source application.',
+  IMAGE_ONLY_PDF:     'Scanned or image-based PDFs require OCR, which is not supported in this version.',
+  SERVER_BUSY:        'Too many files are being converted simultaneously.',
+  INTERNAL_ERROR:     'An unexpected server error occurred. Please try again.',
+  JOB_NOT_FOUND:      'The download link is no longer valid. Please convert the file again.',
+  JOB_FAILED:         '',
+  INVALID_JOB_ID:     '',
 };
 
 // ─── State Machine ────────────────────────────────────────────────────────────
@@ -48,6 +65,7 @@ function setState(newState, message) {
   errorDetail.hidden    = true;
   tryAgainBtn.hidden    = true;
   convertAnotherLink.hidden = true;
+  if (downloadBtn) downloadBtn.hidden = true;
 
   switch (newState) {
     case 'IDLE':
@@ -66,7 +84,7 @@ function setState(newState, message) {
 
     case 'CONVERTING':
       statusBanner.classList.add('status-banner--converting');
-      statusBanner.textContent = message || 'Converting \u2014 please wait\u2026';
+      statusBanner.textContent = message || 'Converting your document\u2026';
       uploadProgress.hidden = false;
       uploadProgress.value  = 100; // Upload complete; show full bar during conversion
       convertBtn.disabled   = true;
@@ -74,18 +92,16 @@ function setState(newState, message) {
 
     case 'SUCCESS':
       statusBanner.classList.add('status-banner--success');
-      statusBanner.textContent = message || 'Conversion complete! Your download has started.';
+      statusBanner.textContent = message || '\u2713 Your DOCX is ready!';
       convertAnotherLink.hidden = false;
+      if (downloadBtn) downloadBtn.hidden = false;
       convertBtn.disabled = true;
       break;
 
     case 'ERROR':
       statusBanner.classList.add('status-banner--error');
-      statusBanner.textContent = 'Conversion failed.';
-      if (message) {
-        errorDetail.textContent = message;
-        errorDetail.hidden = false;
-      }
+      statusBanner.textContent = message || 'An error occurred.';
+      errorDetail.hidden = true;
       tryAgainBtn.hidden  = false;
       convertBtn.disabled = true;
       break;
@@ -232,10 +248,16 @@ convertBtn.addEventListener('click', () => {
         data = JSON.parse(xhr.responseText);
       } catch {
         setState('ERROR', ERROR_MESSAGES.INTERNAL_ERROR);
+        if (ERROR_DETAILS.INTERNAL_ERROR) {
+          errorDetail.textContent = ERROR_DETAILS.INTERNAL_ERROR;
+          errorDetail.hidden = false;
+        }
         return;
       }
+      lastJobId    = data.job_id;
+      lastFilename = data.filename;
       // Trigger download: GET /api/download/{job_id}
-      triggerDownload(data.job_id, data.filename);
+      triggerDownload(lastJobId, lastFilename);
       setState('SUCCESS');
     } else {
       let errorCode = 'INTERNAL_ERROR';
@@ -243,17 +265,26 @@ convertBtn.addEventListener('click', () => {
         const errData = JSON.parse(xhr.responseText);
         errorCode = errData.error_code || 'INTERNAL_ERROR';
       } catch { /* ignore parse error */ }
-      const msg = ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.INTERNAL_ERROR;
-      setState('ERROR', msg);
+      const primaryMsg = ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.INTERNAL_ERROR;
+      const detailMsg  = ERROR_DETAILS[errorCode]  || '';
+      setState('ERROR', primaryMsg);
+      if (detailMsg) {
+        errorDetail.textContent = detailMsg;
+        errorDetail.hidden = false;
+      }
     }
   };
 
   xhr.onerror = () => {
-    setState('ERROR', 'Network error. Please check your connection and try again.');
+    setState('ERROR', 'Upload failed. Please check your connection and try again.');
   };
 
   xhr.ontimeout = () => {
     setState('ERROR', ERROR_MESSAGES.CONVERSION_TIMEOUT);
+    if (ERROR_DETAILS.CONVERSION_TIMEOUT) {
+      errorDetail.textContent = ERROR_DETAILS.CONVERSION_TIMEOUT;
+      errorDetail.hidden = false;
+    }
   };
 
   xhr.open('POST', '/api/convert');
@@ -270,6 +301,35 @@ function triggerDownload(jobId, filename) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+
+// ─── Download DOCX Button Handler (SUCCESS state re-download) ─────────────────
+// The download-btn is shown in SUCCESS state. Clicking it re-triggers the download
+// via the stored lastJobId. If the file was already deleted (Phase 4 one-time
+// download policy), the server returns 404 and we transition SUCCESS→ERROR.
+if (downloadBtn) {
+  downloadBtn.addEventListener('click', () => {
+    if (!lastJobId) return;
+    fetch('/api/download/' + lastJobId, { method: 'GET', redirect: 'manual' })
+      .then((response) => {
+        if (response.ok) {
+          // File still available — trigger download via anchor
+          triggerDownload(lastJobId, lastFilename);
+        } else if (response.status === 404 || response.status === 0) {
+          // File was already deleted after first download (status 0 = opaque redirect)
+          setState('ERROR', ERROR_MESSAGES.JOB_NOT_FOUND);
+          if (ERROR_DETAILS.JOB_NOT_FOUND) {
+            errorDetail.textContent = ERROR_DETAILS.JOB_NOT_FOUND;
+            errorDetail.hidden = false;
+          }
+        } else {
+          setState('ERROR', ERROR_MESSAGES.INTERNAL_ERROR);
+        }
+      })
+      .catch(() => {
+        setState('ERROR', 'Upload failed. Please check your connection and try again.');
+      });
+  });
 }
 
 // ─── Try Again Handler ────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import asyncio
 import logging
 import os
 from pathlib import Path
@@ -21,13 +22,37 @@ logging.basicConfig(
 )
 
 
+async def _run_sweep_loop() -> None:
+    """Periodic TTL sweep — runs every SWEEP_INTERVAL_MINUTES."""
+    from app.core.cleanup import cleanup_service
+    while True:
+        await asyncio.sleep(settings.SWEEP_INTERVAL_MINUTES * 60)
+        try:
+            await cleanup_service.sweep()
+        except Exception as exc:
+            logger.error("TTL sweep error: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Startup
     os.makedirs(settings.TEMP_DIR, exist_ok=True)
     logger.info("Server started. TEMP_DIR=%s", settings.TEMP_DIR)
+
+    # Start TTL sweep background task (sleeps first, then sweeps)
+    sweep_task = asyncio.create_task(_run_sweep_loop())
+    logger.info(
+        "TTL sweep scheduled every %d minutes", settings.SWEEP_INTERVAL_MINUTES
+    )
+
     yield
-    # Shutdown
+
+    # Shutdown — cancel sweep task gracefully
+    sweep_task.cancel()
+    try:
+        await sweep_task
+    except asyncio.CancelledError:
+        pass
     logger.info("Server shutting down.")
 
 
@@ -101,5 +126,6 @@ async def health_check() -> HealthResponse:
 from app.routers.convert import router as convert_router
 app.include_router(convert_router, prefix="/api")
 
-# Phase 4: from app.routers.download import router as download_router
-# Phase 4: app.include_router(download_router, prefix="/api")
+# Phase 4 wiring
+from app.routers.download import router as download_router
+app.include_router(download_router, prefix="/api")

@@ -12,6 +12,11 @@
   <main class="container">
     <h1>PDF to DOCX Converter</h1>
 
+    <!-- Privacy statement — visible above fold before any file is selected (FDBK-04) -->
+    <p id="privacy-statement" class="privacy-statement">
+      Your file is deleted immediately after download &mdash; we never store your documents.
+    </p>
+
     <!-- 1. Drop zone: a <div> containing a hidden <input type="file"> -->
     <div id="drop-zone" class="drop-zone" role="button" tabindex="0"
          aria-label="Drop PDF here or click to browse">
@@ -47,6 +52,9 @@
 
     <!-- 8. Convert Another File anchor (visible in SUCCESS state) -->
     <a id="convert-another-link" href="#" hidden>Convert Another File</a>
+
+    <!-- 9. Download DOCX button (visible in SUCCESS state for re-download) -->
+    <button id="download-btn" type="button" hidden>Download DOCX</button>
   </main>
 
   <script src="/static/app.js"></script>
